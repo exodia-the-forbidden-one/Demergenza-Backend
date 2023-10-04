@@ -8,6 +8,7 @@ namespace Demergenza.Domain.Entities.Menu
     public class Category : BaseEntity
     {
         public string Name { get; set; }
+        public Admin.Admin Admin { get; set; }
         public string Image { get; set; }
         public List<Menu> Menus { get; set; }
     }
