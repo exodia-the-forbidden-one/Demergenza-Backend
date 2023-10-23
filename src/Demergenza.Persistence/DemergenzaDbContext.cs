@@ -40,8 +40,6 @@ namespace Demergenza.Persistence
                 entity.Property(admin => admin.Username).HasColumnName("username").HasColumnType("varchar").HasMaxLength(24);
                 entity.Property(admin => admin.Password).HasColumnName("password").HasColumnType("varchar").HasMaxLength(32);
                 entity.Property(admin => admin.FullName).HasColumnName("fullName").HasColumnType("varchar").HasMaxLength(48);
-
-                entity.HasIndex(i => i.Id).IsUnique();
             });
 
             modelBuilder.Entity<Category>(entity =>
