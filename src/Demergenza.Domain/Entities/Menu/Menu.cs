@@ -11,9 +11,6 @@ namespace Demergenza.Domain.Entities.Menu
         public string Ingredients { get; set; }
         public string Image { get; set; }
         public decimal Price { get; set; }
-        public Guid CategoryId { get; set; }
-        public Guid AdminId { get; set; }
-
         public Category Category { get; set; }
         public Admin.Admin Admin { get; set; }
     }
