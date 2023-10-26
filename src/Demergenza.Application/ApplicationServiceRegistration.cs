@@ -11,6 +11,7 @@ namespace Demergenza.Application
         public static void AddApplicationServices(this IServiceCollection services)
         {
             services.AddSingleton<ConfigurationHelper>();
+            services.AddScoped<TokenHelper>();
         }
     }
 }
