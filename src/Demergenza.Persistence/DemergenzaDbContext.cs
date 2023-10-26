@@ -8,24 +8,26 @@ using Microsoft.Extensions.Configuration;
 using Demergenza.Domain.Entities.Menu;
 using Demergenza.Domain.Entities.Admin;
 using System.Data.Common;
+using Demergenza.Application.Helpers.Configuration;
 
 namespace Demergenza.Persistence
 {
     public class DemergenzaDbContext : DbContext
     {
-        public DemergenzaDbContext(DbContextOptions<DemergenzaDbContext> options) : base(options)
+        private readonly ConfigurationHelper _configurations;
+        public DemergenzaDbContext(DbContextOptions<DemergenzaDbContext> options, ConfigurationHelper configurations) : base(options)
         {
-
+            _configurations = configurations;
         }
-        public DemergenzaDbContext()
+        public DemergenzaDbContext(ConfigurationHelper configurations)
         {
-
+            _configurations = configurations;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            Console.WriteLine(Configurations.ConnectionString);
-            optionsBuilder.UseNpgsql(Configurations.ConnectionString);
+            Console.WriteLine(_configurations.ConnectionString);
+            optionsBuilder.UseNpgsql(_configurations.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
