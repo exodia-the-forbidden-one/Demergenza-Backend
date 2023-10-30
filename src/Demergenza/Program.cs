@@ -3,6 +3,7 @@ using Demergenza.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Demergenza.Application;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,11 @@ app.UseHttpsRedirection();
 app.UseCors("default");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data-images")),
+    RequestPath = "/data-images"
+});
 
 app.MapControllers();
 
