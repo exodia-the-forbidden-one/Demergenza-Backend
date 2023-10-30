@@ -21,9 +21,9 @@ public class ReadRepository<T> : IReadRepository<T> where T : BaseEntity
     public IQueryable<T> GetWhere(Expression<Func<T, bool>> expression)
         => Table.Where(expression);
 
-    public async Task<T> GetFirstAsync(Expression<Func<T, bool>> expression)
+    public async Task<T?> GetFirstAsync(Expression<Func<T, bool>> expression)
         => await Table.FirstOrDefaultAsync(expression);
     
-    public async Task<T> GetByIdAsync(string id)
-        => await Table.FirstOrDefaultAsync(t => t.Id == Guid.Parse(id));
+    public async Task<T?> GetByIdAsync(Guid id)
+        => await Table.FirstOrDefaultAsync(t => t.Id == id);
 }
