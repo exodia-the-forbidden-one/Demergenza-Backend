@@ -2,6 +2,7 @@
 
 using Demergenza.Application.Helpers.Authentication;
 using Demergenza.Application.Helpers.Configuration;
+using Demergenza.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Demergenza.Application
@@ -12,6 +13,7 @@ namespace Demergenza.Application
         {
             services.AddSingleton<ConfigurationHelper>();
             services.AddScoped<TokenHelper>();
+            services.AddScoped<ImageService>();
         }
     }
 }
