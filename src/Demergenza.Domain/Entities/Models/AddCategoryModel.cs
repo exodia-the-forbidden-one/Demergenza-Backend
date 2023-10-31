@@ -5,8 +5,8 @@ namespace Demergenza.Domain.Entities.Models
 {
     public class AddCategoryModel
     {
-        public string adminUserName { get; set; }
-        public string addCategoryName { get; set; }
+        public string AdminUsername { get; set; }
+        public string CategoryName { get; set; }
         public IFormFile categoryImage { get; set; }
     }
 }
