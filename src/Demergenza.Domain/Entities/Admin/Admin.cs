@@ -1,19 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Threading.Tasks;
 using Demergenza.Domain.Entities.Menu;
 
 namespace Demergenza.Domain.Entities.Admin
 {
     public class Admin : BaseEntity
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string FullName { get; set; }
-        public List<Category> Categories { get; set; }
-        public List<Menu.Menu> Menus { get; set; }
-        
+        public string Username { get; set; } = null!;
+
+        public string Password { get; set; } = null!;
+
+        public string FullName { get; set; } = null!;
+
+        public virtual ICollection<Category> TblCategories { get; set; } = new List<Category>();
+
+        public virtual ICollection<Menu.Menu> TblMenus { get; set; } = new List<Menu.Menu>();
     }
 }
