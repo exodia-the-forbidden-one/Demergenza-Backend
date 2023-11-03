@@ -1,5 +1,7 @@
-﻿using Demergenza.Application.Abstractions.Repositories;
+﻿using System.Diagnostics;
+using Demergenza.Application.Abstractions.Repositories;
 using Demergenza.Domain.Entities;
+using Microsoft.AspNetCore.Routing.Tree;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -19,35 +21,59 @@ public class WriteRepository<T> : IWriteRepository<T> where T : BaseEntity
 
     public async Task<bool> AddAsync(T entity)
     {
-        EntityEntry<T> entry = await _context.AddAsync(entity);
-        return entry.State == EntityState.Added;
-    }
-
-    public async Task<bool> AddAsync(List<T> entities)
-    {
-        await _context.AddRangeAsync();
-        return true;
+        try
+        {
+            EntityEntry<T> entry = await _context.AddAsync(entity);
+            if (entry.State == EntityState.Added) await SaveAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<bool> RemoveAsync(T entity)
     {
-        var entry = Table.Remove(entity);
-        await SaveAsync();
-        return entry.State == EntityState.Deleted;
+        try
+        {
+            Table.Remove(entity);
+            await SaveAsync();
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     public async Task<bool> RemoveAsync(Guid id)
     {
-        T entity = await Table.FindAsync(id);
-        return await RemoveAsync(entity);
+        try
+        {
+            T? entity = await Table.FindAsync(id);
+            if (entity is null) throw new Exception("Invalid id");
+            return await RemoveAsync(entity);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<bool> UpdateAsync(T entity)
     {
-        Table.Attach(entity);
-        EntityEntry<T> entry = _context.Update(entity);
-        await SaveAsync();
-        return entry.State == EntityState.Modified;
+        try
+        {
+            Table.Attach(entity);
+            EntityEntry<T> entry = _context.Update(entity);
+            await SaveAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<int> SaveAsync()
