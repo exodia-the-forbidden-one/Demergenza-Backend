@@ -4,14 +4,15 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Demergenza.Domain.Entities.Admin;
 using Demergenza.Application.Helpers.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Demergenza.Application.Helpers.Authentication
 {
 
     public class TokenHelper
     {
-        private readonly ConfigurationHelper _configuration;
-        public TokenHelper(ConfigurationHelper configuration)
+        private readonly IConfiguration _configuration;
+        public TokenHelper(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -19,7 +20,7 @@ namespace Demergenza.Application.Helpers.Authentication
         public string CreateToken(Admin admin)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration.TokenKey);
+            var key = Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]);
             var identity = new ClaimsIdentity(new Claim[]
             {
             new Claim(ClaimTypes.Name, admin.Username)
@@ -28,8 +29,10 @@ namespace Demergenza.Application.Helpers.Authentication
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = _configuration["Token:Issuer"],
+                Audience = _configuration["Token:Audience"],
                 Subject = identity,
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.AddDays(15),
                 SigningCredentials = credentials
             };
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
