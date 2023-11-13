@@ -3,6 +3,7 @@
 
 # data-file
 src/Demergenza/wwwroot/data-images/*
+!src/Demergenza/wwwroot/data-images/.gitkeep
 
 ### Csharp ###
 ## Ignore Visual Studio temporary files, build results, and

@@ -4,15 +4,12 @@ using Demergenza.Application.Services;
 using Demergenza.Domain.Entities.Admin;
 using Demergenza.Domain.Entities.Menu;
 using Demergenza.Domain.Entities.Models;
-using Demergenza.Persistence.Repositories.CategoryRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demergenza.Controllers
 {
 
-
-    [Authorize]
     [ApiController]
     [Route("category")]
     public class CategoryController : Controller
@@ -31,6 +28,7 @@ namespace Demergenza.Controllers
             _imageService = imageService;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("getcategorybyid/{id}")]
         public async Task<IActionResult> GetCategoryById([FromRoute] string id)
@@ -53,6 +51,7 @@ namespace Demergenza.Controllers
             return Ok(categories);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("addcategory")]
         public async Task<IActionResult> AddCategory([FromForm] AddCategoryModel addacategory)
@@ -74,6 +73,7 @@ namespace Demergenza.Controllers
             return Ok(isAdded);
         }
 
+        [Authorize]
         [HttpDelete]
         [Route("deletecategory/{id}")]
         public async Task<IActionResult> DeleteCategory([FromRoute] string id)
@@ -95,10 +95,11 @@ namespace Demergenza.Controllers
             return BadRequest(id);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("updatecategory/{id}")]
         public async Task<IActionResult> UpdateCategory([FromRoute] string id,
-            [FromForm] UpdateCategoryModel categoryModel)
+                    [FromForm] UpdateCategoryModel categoryModel)
         {
             Category? category = await _categoryRead.GetByIdAsync(Guid.Parse(id));
 

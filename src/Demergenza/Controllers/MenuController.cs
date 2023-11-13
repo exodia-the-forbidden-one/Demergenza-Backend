@@ -1,101 +1,84 @@
 using Demergenza.Application.Abstractions.Repositories.AdminRepository;
 using Demergenza.Application.Abstractions.Repositories.CategoryRepository;
+using Microsoft.AspNetCore.Hosting;
+using Demergenza.Domain.Entities.Admin;
 using Demergenza.Domain.Entities.Menu;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Demergenza.Domain.Entities.Models;
-using Demergenza.Domain.Entities.Admin;
-using Demergenza.Application.Services;
-using Demergenza.Application.Abstractions.Repositories.MenuRepository;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Demergenza.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("menu")]
     public class MenuController : Controller
     {
-        private readonly IAdminReadRepository _adminRead;
-        private readonly ImageService _imageService;
-        private readonly IMenuWriteRepository _menuWrite;
-        private readonly IMenuReadRepository _menuRead;
+        private readonly ICategoryWriteRepository _categoryWrite;
         private readonly ICategoryReadRepository _categoryRead;
-
-        public MenuController(
-            IAdminReadRepository adminRead, ImageService imageService,
-            IMenuWriteRepository menuWrite, IMenuReadRepository menuRead, ICategoryReadRepository categoryRead)
+        private readonly IAdminReadRepository _adminRead;
+        private readonly IWebHostEnvironment _hostEnviroment;
+        public MenuController(ICategoryWriteRepository categoryWrite, ICategoryReadRepository categoryRead, IWebHostEnvironment hostEnvironment, IAdminReadRepository adminRead)
         {
-            _adminRead = adminRead;
-            _imageService = imageService;
-            _menuWrite = menuWrite;
-            _menuRead = menuRead;
+            _categoryWrite = categoryWrite;
             _categoryRead = categoryRead;
+            _hostEnviroment = hostEnvironment;
+            _adminRead = adminRead;
+        }
+
+        [HttpGet]
+        [Route("getallcategories")]
+        public IActionResult GetAllCategories()
+        {
+            IQueryable<Category> categories = _categoryRead.GetAll();
+            return Ok(categories);
         }
 
         [HttpPost]
-        [Route("addmenu")]
-        public async Task<IActionResult> AddMenu([FromForm] AddMenuModel addMenuModel)
+        [Route("addcategory")]
+        public async Task<IActionResult> AddCategory([FromForm] AddCategoryModel addCategory)
         {
-            string imageName = _imageService.SaveImage(addMenuModel.MenuImage);
-            Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == addMenuModel.AdminUserName);
-            if (admin is null) return Unauthorized("specified admin not found");
-            Category? category =
-                await _categoryRead.GetFirstAsync(category => category.Id == Guid.Parse(addMenuModel.CategoryId));
-            if (category is null) return BadRequest("specified category not found");
-            Menu menu = new Menu()
+
+            string[] filenameAndExtension = addCategory.categoryImage.FileName.Split('.');
+            string newImageName = Guid.NewGuid().ToString() + "." + filenameAndExtension[1];
+            string path = Path.Combine(_hostEnviroment.WebRootPath, "data-images", newImageName);
+
+            Category category = new()
             {
-                Name = addMenuModel.MenuName,
-                Image = $"{Request.Scheme}://{Request.Host}/data-images/{imageName}",
-                Price = addMenuModel.MenuPrice,
-                Ingredients = addMenuModel.MenuIngredients,
-                Admin = admin,
-                CategoryId = category.Id
+                Id = Guid.NewGuid(),
+                Name = addCategory.CategoryName,
+                Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}",
+                Admin = await _adminRead.GetFirstAsync(admin => admin.Username == addCategory.AdminUsername)
             };
-            bool isAdded = await _menuWrite.AddAsync(menu);
-            return Ok(isAdded);
+
+            using (FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                addCategory.categoryImage.CopyTo(fileStream);
+            }
+
+            var x = await _categoryWrite.AddAsync(category);
+            await _categoryWrite.SaveAsync();
+
+            return Ok(new
+            {
+                Ok = x
+            });
         }
 
         [HttpDelete]
-        [Route("deletemenu/{id}")]
-        public async Task<IActionResult> DeleteMenu([FromRoute] string id)
+        [Route("deletecategory/{id}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute] string id)
         {
-            if (!Guid.TryParse(id, out Guid parsedId)) return BadRequest("invalid id type");
-            Menu? menu = await _menuRead.GetByIdAsync(parsedId);
-            if (menu is null)
+            Console.WriteLine(id);
+            if (id is not null)
             {
-                return BadRequest("Specified category doesnt exist");
+                await _categoryWrite.RemoveAsync(Guid.Parse(id));
+                await _categoryWrite.SaveAsync();
+                return Ok(true);
             }
-
-            await _menuWrite.RemoveAsync(Guid.Parse(id));
-            await _menuWrite.SaveAsync();
-            bool isDeleted = _imageService.DeleteImageByName(Path.GetFileName(menu.Image));
-            return Ok(isDeleted);
+            return BadRequest(id);
         }
 
-        [HttpPost]
-        [Route("updatemenu")]
-        public async Task<IActionResult> UpdateMenu([FromForm] UpdateMenuModel menuModel)
-        {
-            Console.WriteLine(menuModel.Id);
-            Menu? menu = await _menuRead.GetFirstAsync(m => m.Id == Guid.Parse(menuModel.Id));
-            if (menu == null) return BadRequest("invalid id");
-            Console.WriteLine(menuModel.Id);
-            var admin = _adminRead.Select(a => a.Id).First();
-            menu.AdminId = admin;
-            menu.Name = menuModel.MenuName;
-            menu.Price = menuModel.MenuPrice;
-            menu.Ingredients = menuModel.MenuIngredients;
-
-            if (menuModel.MenuImage is not null)
-            {
-                string oldImageName = Path.GetFileName(menu.Image);
-                string newImageName = _imageService.SaveImage(menuModel.MenuImage);
-                menu.Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}";
-                _imageService.DeleteImageByName(oldImageName);
-            }
-            await _menuWrite.UpdateAsync(menu);
-
-            return Ok(menu);
-        }
     }
 }
+
+
