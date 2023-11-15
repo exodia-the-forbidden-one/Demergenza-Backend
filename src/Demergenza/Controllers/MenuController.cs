@@ -42,12 +42,15 @@ namespace Demergenza.Controllers
             string newImageName = Guid.NewGuid().ToString() + "." + filenameAndExtension[1];
             string path = Path.Combine(_hostEnviroment.WebRootPath, "data-images", newImageName);
 
+            Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == addCategory.AdminUsername);
+            if (admin == null) return Unauthorized();
+            
             Category category = new()
             {
                 Id = Guid.NewGuid(),
                 Name = addCategory.CategoryName,
                 Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}",
-                Admin = await _adminRead.GetFirstAsync(admin => admin.Username == addCategory.AdminUsername)
+                Admin = admin
             };
 
             using (FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate))

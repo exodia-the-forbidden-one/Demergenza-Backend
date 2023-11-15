@@ -67,8 +67,8 @@ namespace Demergenza.Persistence
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Admin> Admins;
-        public DbSet<Category> Categories;
-        public DbSet<Menu> Menus;
+        public DbSet<Admin>? Admins;
+        public DbSet<Category>? Categories;
+        public DbSet<Menu>? Menus;
     }
 }

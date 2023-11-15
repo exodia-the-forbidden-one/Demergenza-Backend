@@ -27,7 +27,7 @@ namespace Demergenza.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginObject)
         {
-            Admin admin = await _adminRead.GetFirstAsync(admin => admin.Username == loginObject.Username && admin.Password == loginObject.Password);
+            Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == loginObject.Username && admin.Password == loginObject.Password);
 
             if (admin != null)
             {

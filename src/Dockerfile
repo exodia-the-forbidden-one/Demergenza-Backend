@@ -19,6 +19,8 @@ RUN dotnet publish Demergenza/Demergenza.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
+
+RUN mkdir configuration
 RUN mkdir wwwroot
 RUN mkdir wwwroot/data-images
 COPY --from=build /app/out .

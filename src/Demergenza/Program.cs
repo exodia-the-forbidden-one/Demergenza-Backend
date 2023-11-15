@@ -6,11 +6,13 @@ using Demergenza.Application;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddHttpsRedirection(options=>{
     options.HttpsPort = 5133;
 });
 builder.WebHost.UseUrls("https://*:5133;http://*:5134");
+builder.Configuration.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "configuration"))
+    .AddJsonFile("appsettings.json");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new()
