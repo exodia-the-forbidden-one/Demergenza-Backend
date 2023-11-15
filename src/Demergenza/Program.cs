@@ -7,7 +7,10 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("https://*:5133");
+builder.Services.AddHttpsRedirection(options=>{
+    options.HttpsPort = 5133;
+});
+builder.WebHost.UseUrls("https://*:5133;http://*:5134");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new()
