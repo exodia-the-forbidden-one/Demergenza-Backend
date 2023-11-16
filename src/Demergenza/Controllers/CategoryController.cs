@@ -11,7 +11,7 @@ namespace Demergenza.Controllers
 {
 
     [ApiController]
-    [Route("category")]
+    [Route("api/category")]
     public class CategoryController : Controller
     {
         private readonly ICategoryWriteRepository _categoryWrite;

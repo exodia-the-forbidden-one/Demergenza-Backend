@@ -12,7 +12,7 @@ namespace Demergenza.Domain.Entities.Menu
 
         public string Ingredients { get; set; } = null!;
 
-        public string Image { get; set; } = null!;
+        public string? Image { get; set; }
 
         public decimal Price { get; set; }
 

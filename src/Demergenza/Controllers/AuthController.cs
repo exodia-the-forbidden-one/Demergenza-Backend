@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Demergenza.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("api/auth")]
     public class AuthController : Controller
     {
         private readonly IAdminReadRepository _adminRead;
