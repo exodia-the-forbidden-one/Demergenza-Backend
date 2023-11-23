@@ -7,6 +7,8 @@ using Demergenza.Domain.Entities.Admin;
 using Demergenza.Application.Services;
 using Demergenza.Application.Abstractions.Repositories.MenuRepository;
 using Microsoft.AspNetCore.Authorization;
+using Demergenza.Domain.Entities.Menu.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Demergenza.Controllers
 {
@@ -35,9 +37,23 @@ namespace Demergenza.Controllers
         [Route("getallmenusbycategoryname/{categoryName}")]
         public async Task<IActionResult> GetMenusByCategoryName([FromRoute] string categoryName)
         {
-            Category? category = await _categoryRead.GetFirstAsync(x => x.Name == categoryName);
+            var category = await _categoryRead.GetWhere(c => c.Name == categoryName).Select(c => new Category()
+            {
+                Id = c.Id,
+                Menus = c.Menus,
+                Name = c.Name,
+                Image = c.Image
+            }).FirstAsync();
+
+
             if (category == null) return NoContent();
-            IQueryable<Menu> menus = _menuRead.GetWhere(x => x.CategoryId == category.Id);
+            List<MenuResponse> menus = category.Menus.Select(menu => new MenuResponse()
+            {
+                Name = menu.Name,
+                Ingredients = menu.Ingredients,
+                Image = menu.Image,
+                Price = menu.Price
+            }).ToList();
             return Ok(menus);
         }
 
@@ -63,7 +79,7 @@ namespace Demergenza.Controllers
                 Admin = admin,
                 CategoryId = category.Id
             };
-            if (addMenuModel.MenuImage != null) menu.Image =  $"{Request.Scheme}://{Request.Host}/data-images/{imageName}";
+            if (addMenuModel.MenuImage != null) menu.Image = $"{Request.Scheme}://{Request.Host}/data-images/{imageName}";
             bool isAdded = await _menuWrite.AddAsync(menu);
             return Ok(isAdded);
         }
