@@ -39,6 +39,7 @@ namespace Demergenza.Persistence
                 entity.ToTable("tbl_admin");
 
                 entity.Property(admin => admin.Id).HasColumnName("id").HasColumnType("uuid");
+                entity.Property(admin => admin.Date).HasColumnName("date");
                 entity.Property(admin => admin.Username).HasColumnName("username").HasColumnType("varchar").HasMaxLength(24);
                 entity.Property(admin => admin.Password).HasColumnName("password").HasColumnType("varchar").HasMaxLength(32);
                 entity.Property(admin => admin.FullName).HasColumnName("fullName").HasColumnType("varchar").HasMaxLength(48);
@@ -49,6 +50,7 @@ namespace Demergenza.Persistence
                 entity.ToTable("tbl_category");
 
                 entity.Property(category => category.Id).HasColumnName("id").HasColumnType("uuid");
+                entity.Property(category => category.Date).HasColumnName("date");
                 entity.Property(category => category.Name).HasColumnName("name").HasColumnType("varchar").HasMaxLength(48);
                 entity.Property(category => category.Image).HasColumnName("image").HasColumnType("varchar").HasMaxLength(250);
             });
@@ -59,6 +61,7 @@ namespace Demergenza.Persistence
                 entity.ToTable("tbl_menu");
 
                 entity.Property(menu => menu.Id).HasColumnName("id").HasColumnType("uuid");
+                entity.Property(menu => menu.Date).HasColumnName("date");
                 entity.Property(menu => menu.Name).HasColumnName("name").HasColumnType("varchar").HasMaxLength(48);
                 entity.Property(menu => menu.Image).HasColumnName("image").HasColumnType("varchar").HasMaxLength(250);
                 entity.Property(menu => menu.Ingredients).HasColumnName("Ingredients").HasColumnType("varchar").HasMaxLength(250);

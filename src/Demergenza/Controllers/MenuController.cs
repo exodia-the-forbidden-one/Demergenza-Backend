@@ -52,8 +52,9 @@ namespace Demergenza.Controllers
                 Name = menu.Name,
                 Ingredients = menu.Ingredients,
                 Image = menu.Image,
-                Price = menu.Price
-            }).ToList();
+                Price = menu.Price,
+                Date = menu.Date
+            }).OrderBy(m => m.Date).ToList();
             return Ok(menus);
         }
 
@@ -77,7 +78,8 @@ namespace Demergenza.Controllers
                 Price = addMenuModel.MenuPrice,
                 Ingredients = addMenuModel.MenuIngredients,
                 Admin = admin,
-                CategoryId = category.Id
+                CategoryId = category.Id,
+                Date = DateTime.UtcNow
             };
             if (addMenuModel.MenuImage != null) menu.Image = $"{Request.Scheme}://{Request.Host}/data-images/{imageName}";
             bool isAdded = await _menuWrite.AddAsync(menu);
@@ -116,6 +118,7 @@ namespace Demergenza.Controllers
             menu.Name = menuModel.MenuName;
             menu.Price = menuModel.MenuPrice;
             menu.Ingredients = menuModel.MenuIngredients;
+            menu.Date = DateTime.UtcNow;
 
             if (menuModel.MenuImage is not null)
             {

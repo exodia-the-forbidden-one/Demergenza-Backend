@@ -64,7 +64,8 @@ namespace Demergenza.Controllers
                 Id = Guid.NewGuid(),
                 Name = addacategory.CategoryName,
                 Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}",
-                Admin = admin
+                Admin = admin,
+                Date = DateTime.UtcNow
             };
 
             var isAdded = await _categoryWrite.AddAsync(category);
@@ -117,6 +118,7 @@ namespace Demergenza.Controllers
             Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == categoryModel.AdminUsername);
             category.Admin = admin ?? category.Admin;
             category.Name = categoryModel.CategoryName ?? category.Name;
+            category.Date = DateTime.UtcNow;
 
             await _categoryWrite.UpdateAsync(category);
 
