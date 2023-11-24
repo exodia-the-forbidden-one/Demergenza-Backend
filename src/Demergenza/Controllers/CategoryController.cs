@@ -107,7 +107,7 @@ namespace Demergenza.Controllers
 
             if (categoryModel.CategoryImage is not null)
             {
-                string oldImageName = Path.GetFileName(category.Image);
+                string? oldImageName = Path.GetFileName(category.Image);
                 string newImageName = _imageService.SaveImage(categoryModel.CategoryImage);
                 category.Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}";
                 _imageService.DeleteImageByName(oldImageName);

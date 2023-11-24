@@ -119,10 +119,10 @@ namespace Demergenza.Controllers
 
             if (menuModel.MenuImage is not null)
             {
-                string oldImageName = Path.GetFileName(menu.Image);
+                string? oldImageName = Path.GetFileName(menu.Image);
                 string newImageName = _imageService.SaveImage(menuModel.MenuImage);
                 menu.Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}";
-                _imageService.DeleteImageByName(oldImageName);
+                if (oldImageName != null) _imageService.DeleteImageByName(oldImageName);
             }
             await _menuWrite.UpdateAsync(menu);
 

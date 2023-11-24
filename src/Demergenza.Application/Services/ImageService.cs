@@ -18,11 +18,11 @@ namespace Demergenza.Application.Services
             DataImagesPath = Path.Combine(_hostEnvironment.WebRootPath, "data-images");
         }
 
-/// <summary>
-/// Saves an uploaded image to a data-images directory.
-/// </summary>
-/// <param name="formFile">The uploaded image file as an IFormFile object.</param>
-/// <returns>The unique name of the saved image file.</returns>
+        /// <summary>
+        /// Saves an uploaded image to a data-images directory.
+        /// </summary>
+        /// <param name="formFile">The uploaded image file as an IFormFile object.</param>
+        /// <returns>The unique name of the saved image file.</returns>
         public string SaveImage(IFormFile formFile)
         {
             string fileExtension = Path.GetExtension(formFile.FileName);
@@ -36,10 +36,14 @@ namespace Demergenza.Application.Services
             return newImageName;
         }
 
-        public bool DeleteImageByName(string imageName)
+        public bool DeleteImageByName(string? imageName)
         {
-            File.Delete(Path.Combine(DataImagesPath,imageName));
-            return true;
+            if (imageName != null)
+            {
+                File.Delete(Path.Combine(DataImagesPath, imageName));
+                return true;
+            }
+            return false;
         }
     }
 }
