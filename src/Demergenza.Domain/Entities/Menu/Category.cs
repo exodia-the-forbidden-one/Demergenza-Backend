@@ -1,5 +1,3 @@
-using Demergenza.Domain.Entities.Menu;
-
 namespace Demergenza.Domain.Entities.Menu
 {
     public class Category : BaseEntity

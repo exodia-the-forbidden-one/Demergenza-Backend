@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Demergenza.Domain.Entities.Menu
 {
     public class Menu : BaseEntity
     {
         public string Name { get; set; } = null!;
 
-        public string Ingredients { get; set; } = null!;
+        public string? Ingredients { get; set; }
 
         public string? Image { get; set; }
 

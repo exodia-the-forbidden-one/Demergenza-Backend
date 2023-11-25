@@ -20,7 +20,7 @@ namespace Demergenza.Application.Helpers.Authentication
         public string CreateToken(Admin admin)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]!);
             var identity = new ClaimsIdentity(new Claim[]
             {
             new Claim(ClaimTypes.Name, admin.Username)

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
 namespace Demergenza.Application.Helpers.Configuration
@@ -19,7 +15,7 @@ namespace Demergenza.Application.Helpers.Configuration
         {
             get
             {
-                return _configuration["Token:SecurityKey"];
+                return _configuration["Token:SecurityKey"]!;
             }
         }
 
@@ -27,7 +23,7 @@ namespace Demergenza.Application.Helpers.Configuration
         {
             get
             {
-                return _configuration["ConnectionStrings:PostgreSQL"];
+                return _configuration["ConnectionStrings:PostgreSQL"]!;
             }
         }
 
