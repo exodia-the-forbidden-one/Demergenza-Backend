@@ -2,12 +2,12 @@ using Demergenza.Application.Abstractions.Repositories.AdminRepository;
 using Demergenza.Application.Abstractions.Repositories.CategoryRepository;
 using Demergenza.Domain.Entities.Menu;
 using Microsoft.AspNetCore.Mvc;
-using Demergenza.Domain.Entities.Models;
 using Demergenza.Domain.Entities.Admin;
 using Demergenza.Application.Services;
 using Demergenza.Application.Abstractions.Repositories.MenuRepository;
+using Demergenza.Application.DTOs.Menu;
 using Microsoft.AspNetCore.Authorization;
-using Demergenza.Domain.Entities.Menu.Models;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Demergenza.Controllers
@@ -61,7 +61,7 @@ namespace Demergenza.Controllers
         [Authorize]
         [HttpPost]
         [Route("addmenu")]
-        public async Task<IActionResult> AddMenu([FromForm] AddMenuModel addMenuModel)
+        public async Task<IActionResult> AddMenu([FromForm] AddMenu addMenuModel)
         {
 
 
@@ -107,12 +107,10 @@ namespace Demergenza.Controllers
         [Authorize]
         [HttpPost]
         [Route("updatemenu")]
-        public async Task<IActionResult> UpdateMenu([FromForm] UpdateMenuModel menuModel)
+        public async Task<IActionResult> UpdateMenu([FromForm] UpdateMenu menuModel)
         {
-            Console.WriteLine(menuModel.Id);
             Menu? menu = await _menuRead.GetFirstAsync(m => m.Id == Guid.Parse(menuModel.Id));
             if (menu == null) return BadRequest("invalid id");
-            Console.WriteLine(menuModel.Id);
             var admin = _adminRead.Select(a => a.Id).First();
             menu.AdminId = admin;
             menu.Name = menuModel.MenuName;

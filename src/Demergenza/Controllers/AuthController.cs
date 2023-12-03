@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Demergenza.Application.Abstractions.Repositories;
 using Demergenza.Application.Abstractions.Repositories.AdminRepository;
+using Demergenza.Application.DTOs.Auth;
 using Demergenza.Application.Helpers.Authentication;
 using Demergenza.Domain.Entities.Admin;
-using Demergenza.Domain.Entities.Menu.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demergenza.Controllers
@@ -25,7 +20,7 @@ namespace Demergenza.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel loginObject)
+        public async Task<IActionResult> Login([FromBody] Login loginObject)
         {
             Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == loginObject.Username && admin.Password == loginObject.Password);
 

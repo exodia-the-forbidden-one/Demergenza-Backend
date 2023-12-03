@@ -1,6 +1,8 @@
+using Demergenza.Application.Abstractions.Repositories.AboutUsRepository;
 using Demergenza.Application.Abstractions.Repositories.AdminRepository;
 using Demergenza.Application.Abstractions.Repositories.CategoryRepository;
 using Demergenza.Application.Abstractions.Repositories.MenuRepository;
+using Demergenza.Persistence.Repositories.AboutUsRepository;
 using Demergenza.Persistence.Repositories.AdminRepository;
 using Demergenza.Persistence.Repositories.CategoryRepository;
 using Demergenza.Persistence.Repositories.MenuRepository;
@@ -19,6 +21,8 @@ namespace Demergenza.Persistence
             services.AddScoped<ICategoryReadRepository, CategoryReadRepository>();
             services.AddScoped<IMenuWriteRepository, MenuWriteRepository>();
             services.AddScoped<IMenuReadRepository, MenuReadRepository>();
+            services.AddScoped<IAboutUsReadRepository, AboutUsReadRepository>();
+            services.AddScoped<IAboutUsWriteRepository, AboutUsWriteRepository>();
         }
     }
 }

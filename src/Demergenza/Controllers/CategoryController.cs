@@ -1,15 +1,14 @@
 using Demergenza.Application.Abstractions.Repositories.AdminRepository;
 using Demergenza.Application.Abstractions.Repositories.CategoryRepository;
+using Demergenza.Application.DTOs.Category;
 using Demergenza.Application.Services;
 using Demergenza.Domain.Entities.Admin;
 using Demergenza.Domain.Entities.Menu;
-using Demergenza.Domain.Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demergenza.Controllers
 {
-
     [ApiController]
     [Route("api/category")]
     public class CategoryController : Controller
@@ -54,7 +53,7 @@ namespace Demergenza.Controllers
         [Authorize]
         [HttpPost]
         [Route("addcategory")]
-        public async Task<IActionResult> AddCategory([FromForm] AddCategoryModel addacategory)
+        public async Task<IActionResult> AddCategory([FromForm] AddCategory addacategory)
         {
             string newImageName = _imageService.SaveImage(addacategory.categoryImage);
             Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == addacategory.AdminUsername);
@@ -79,28 +78,23 @@ namespace Demergenza.Controllers
         [Route("deletecategory/{id}")]
         public async Task<IActionResult> DeleteCategory([FromRoute] string id)
         {
-            if (id is not null)
+            Category? category = await _categoryRead.GetByIdAsync(Guid.Parse(id));
+            if (category is null)
             {
-                Category? category = await _categoryRead.GetByIdAsync(Guid.Parse(id));
-                if (category is null)
-                {
-                    return BadRequest("Specified category doesnt exist");
-                }
-
-                await _categoryWrite.RemoveAsync(Guid.Parse(id));
-                await _categoryWrite.SaveAsync();
-                bool isDeleted = _imageService.DeleteImageByName(Path.GetFileName(category.Image));
-                return Ok(isDeleted);
+                return BadRequest("Specified category doesnt exist");
             }
 
-            return BadRequest(id);
+            await _categoryWrite.RemoveAsync(Guid.Parse(id));
+            await _categoryWrite.SaveAsync();
+            bool isDeleted = _imageService.DeleteImageByName(Path.GetFileName(category.Image));
+            return Ok(isDeleted);
         }
 
         [Authorize]
         [HttpPost]
         [Route("updatecategory/{id}")]
         public async Task<IActionResult> UpdateCategory([FromRoute] string id,
-                    [FromForm] UpdateCategoryModel categoryModel)
+            [FromForm] UpdateCategory categoryModel)
         {
             Category? category = await _categoryRead.GetByIdAsync(Guid.Parse(id));
 
@@ -125,5 +119,4 @@ namespace Demergenza.Controllers
             return Ok();
         }
     }
-
 }
