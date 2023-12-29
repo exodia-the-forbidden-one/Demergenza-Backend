@@ -3,13 +3,11 @@ using Demergenza.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Demergenza.Application;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.HttpsPort = 5133;
-});
+builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 5133; });
 builder.WebHost.UseUrls("https://*:5133;http://*:5134");
 if (!builder.Environment.IsDevelopment())
 {
@@ -27,7 +25,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Token:Issuer"],
         ValidAudience = builder.Configuration["Token:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"]!)),
+        IssuerSigningKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"]!)),
         ClockSkew = TimeSpan.Zero
     };
 });
@@ -37,8 +36,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("default", corsPolicyBuilder =>
     {
         corsPolicyBuilder.AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowAnyOrigin();
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
     });
 });
 builder.Services.AddPersistenceServices();
@@ -55,6 +54,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    DemergenzaDbContext dbContext = scope.ServiceProvider.GetRequiredService<DemergenzaDbContext>();
+    dbContext.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
