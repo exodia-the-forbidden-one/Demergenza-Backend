@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+
+  postgres:
+    container_name: c_postgres
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: dbdemergenza
+      POSTGRES_USER: exodia
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  api:
+    container_name: c_api
+    build:
+      context: src/.
+    volumes:
+      - ssl:/nginx/ssl/
+      - api_images:/app/wwwroot/data-images
+      - api_config:/app/configuration
+    ports:
+      - 5132:5133
+    environment:
+      ASPNETCORE_URLS: https://+;http://+
+      ASPNETCORE_HTTPS_PORT: 5133
+      ASPNETCORE_Kestrel__Certificates__Default__Password: mysecretkey
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /nginx/ssl/ssl.pfx
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - backend
+    
+  nginx_api:
+    ports:
+      - 5133:443
+    container_name: c_nginx_api
+    build:
+      context: .
+      dockerfile: ./nginx/nginx.Dockerfile
+    volumes:
+      - ssl:/etc/nginx/ssl/
+    networks:
+      - backend
+
+volumes:
+  api_images:
+  pgdata:
+  ssl:
+  api_config:
+    external: true
+
+networks:
+  backend:
+  

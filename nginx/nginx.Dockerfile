@@ -11,3 +11,5 @@ RUN mkdir -p /etc/nginx/ssl \
 RUN openssl pkcs12 -export -in /etc/nginx/ssl/ssl.crt -inkey /etc/nginx/ssl/ssl.key -out /etc/nginx/ssl/ssl.pfx -passout pass:mysecretkey
 
 COPY nginx/conf/nginx.conf /etc/nginx/nginx.conf
+
+CMD ["nginx", "-g", "daemon off;"]
