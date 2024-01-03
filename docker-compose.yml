@@ -23,11 +23,12 @@ services:
       context: src/.
     volumes:
       - ssl:/nginx/ssl/
-      - api_images:/app/wwwroot/data-images
+      - data_images:/app/wwwroot/data-images
       - api_config:/app/configuration
     ports:
       - 5132:5133
     environment:
+      API_ENDPOINT: ${API_ENDPOINT}
       ASPNETCORE_URLS: https://+;http://+
       ASPNETCORE_HTTPS_PORT: 5133
       ASPNETCORE_Kestrel__Certificates__Default__Password: mysecretkey
@@ -40,18 +41,21 @@ services:
     
   nginx_api:
     ports:
-      - 5133:443
+      - 8443:443
     container_name: c_nginx_api
     build:
       context: .
       dockerfile: ./nginx/nginx.Dockerfile
     volumes:
       - ssl:/etc/nginx/ssl/
+      - data_images:/etc/nginx/data-images
     networks:
       - backend
+    depends_on:
+      - api
 
 volumes:
-  api_images:
+  data_images:
   pgdata:
   ssl:
   api_config:

@@ -10,6 +10,6 @@ namespace Demergenza.Domain.Entities.Menu
 
         public virtual Admin.Admin Admin { get; set; } = null!;
 
-        public virtual ICollection<Menu> Menus { get; set; } = new List<Menu>();
+        public virtual List<Menu> Menus { get; set; }
     }
 }

@@ -21,7 +21,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 
 RUN mkdir configuration
-RUN mkdir -p wwwroot/data-images
+RUN mkdir -p wwwroot/data-images 
+
 COPY --from=build /app/out .
 
 ENTRYPOINT ["dotnet", "Demergenza.dll"]

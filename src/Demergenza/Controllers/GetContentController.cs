@@ -1,4 +1,6 @@
-﻿using Demergenza.Application.Abstractions.Repositories.AboutUsRepository;
+﻿using System.Reflection;
+using Demergenza.Application.Abstractions.Repositories.AboutUsRepository;
+using Demergenza.Application.DTOs.AboutUs;
 using Demergenza.Domain.Entities.PageContents;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +22,14 @@ public class GetContentController : Controller
     public async Task<IActionResult> GetAboutUs()
     {
         AboutUs? aboutUs = await _aboutUsRead.GetFirstAsync();
-        return Ok(aboutUs);
+
+        AboutUsResponse aboutUsResponse = new AboutUsResponse();
+
+        if (aboutUs is not null)
+        {
+            aboutUsResponse.TextContent = aboutUs.TextContent;
+            aboutUsResponse.Image = aboutUs.Image;
+        }
+        return Ok(aboutUsResponse);
     }
 }

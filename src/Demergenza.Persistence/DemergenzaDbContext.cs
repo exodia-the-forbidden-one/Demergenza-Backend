@@ -76,7 +76,7 @@ namespace Demergenza.Persistence
                     .HasColumnType("timestamp with time zone");
                 entity.Property(content => content.TextContent).HasColumnName("text-content")
                     .HasColumnType("varchar(2000)");
-                entity.Property(content => content.ImagePath).HasColumnName("image-path").HasColumnType("varchar(150)");
+                entity.Property(content => content.Image).HasColumnName("image").HasColumnType("varchar(150)");
             });
 
             modelBuilder.Entity<Hero>(entity =>

@@ -28,36 +28,34 @@ public class SetContentController : Controller
     [Route("about-us")]
     public async Task<IActionResult> AboutUs([FromForm] SetAboutUs setAboutUs)
     {
-        AboutUs? aboutUs;
+        AboutUs? aboutUs = await _aboutUsReadRepository.GetFirstAsync();
 
-        aboutUs = await _aboutUsReadRepository.GetFirstAsync();
         if (aboutUs is not null)
         {
             aboutUs.TextContent = setAboutUs.TextContent;
             if (setAboutUs.Image is not null)
             {
-                string? oldImageName = Path.GetFileName(aboutUs.ImagePath);
+                string? oldImageName = aboutUs.Image ?? null;
                 string newImageName = _imageService.SaveImage(setAboutUs.Image);
-                aboutUs.ImagePath = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}";
-                if (oldImageName != null) _imageService.DeleteImageByName(oldImageName);
+                aboutUs.Image = newImageName;
+                if (oldImageName is not null) _imageService.DeleteImageByName(oldImageName);
             }
 
             await _aboutUsWriteRepository.UpdateAsync(aboutUs);
         }
         else
         {
-            string imagePath = "";
+            string newImageName = "";
             if (setAboutUs.Image is not null)
             {
-                string newImageName = _imageService.SaveImage(setAboutUs.Image);
-                imagePath = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}";
+                newImageName = _imageService.SaveImage(setAboutUs.Image);
             }
 
             aboutUs = new AboutUs()
             {
                 Id = Guid.NewGuid(),
                 Date = DateTime.UtcNow,
-                ImagePath = imagePath,
+                Image = string.IsNullOrEmpty(newImageName) ? null : newImageName,
                 TextContent = setAboutUs.TextContent
             };
             await _aboutUsWriteRepository.AddAsync(aboutUs);

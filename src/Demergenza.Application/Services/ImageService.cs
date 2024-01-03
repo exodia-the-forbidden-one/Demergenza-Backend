@@ -36,14 +36,12 @@ namespace Demergenza.Application.Services
             return newImageName;
         }
 
-        public bool DeleteImageByName(string? imageName)
+        public bool DeleteImageByName(string imageName)
         {
-            if (imageName != null)
             {
                 File.Delete(Path.Combine(DataImagesPath, imageName));
                 return true;
             }
-            return false;
         }
     }
 }
