@@ -7,7 +7,6 @@ using Demergenza.Application.Services;
 using Demergenza.Application.Abstractions.Repositories.MenuRepository;
 using Demergenza.Application.DTOs.Menu;
 using Microsoft.AspNetCore.Authorization;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Demergenza.Controllers
@@ -37,24 +36,21 @@ namespace Demergenza.Controllers
         [Route("getallmenusbycategoryname/{categoryName}")]
         public async Task<IActionResult> GetMenusByCategoryName([FromRoute] string categoryName)
         {
-            var category = await _categoryRead.GetWhere(c => c.Name == categoryName).Select(c => new Category()
-            {
-                Id = c.Id,
-                Menus = c.Menus,
-                Name = c.Name,
-                Image = c.Image
-            }).FirstAsync();
+            Category? category = await _categoryRead.GetAll()
+                .Include(c => c.Menus)
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
 
+            if (category == null) return NotFound();
 
-            if (category == null) return NoContent();
-            List<MenuResponse> menus = category.Menus.Select(menu => new MenuResponse()
+            List<MenuResponse> menus = category.Menus.Select(m => new MenuResponse()
             {
-                Name = menu.Name,
-                Ingredients = menu.Ingredients,
-                Image = menu.Image,
-                Price = menu.Price,
-                Date = menu.Date
-            }).OrderBy(m => m.Date).ToList();
+                Name = m.Name,
+                Image = m.Image,
+                Ingredients = m.Ingredients,
+                Price = m.Price,
+                Date = m.Date,
+                Id = m.Id
+            }).ToList();
             return Ok(menus);
         }
 
@@ -63,8 +59,6 @@ namespace Demergenza.Controllers
         [Route("addmenu")]
         public async Task<IActionResult> AddMenu([FromForm] AddMenu addMenuModel)
         {
-
-
             string? imageName = addMenuModel.MenuImage != null ? _imageService.SaveImage(addMenuModel.MenuImage) : null;
 
             Admin? admin = await _adminRead.GetFirstAsync(admin => admin.Username == addMenuModel.AdminUserName);
@@ -81,7 +75,7 @@ namespace Demergenza.Controllers
                 CategoryId = category.Id,
                 Date = DateTime.UtcNow
             };
-            if (addMenuModel.MenuImage != null) menu.Image = $"{Request.Scheme}://{Request.Host}/data-images/{imageName}";
+            if (addMenuModel.MenuImage != null) menu.Image = imageName;
             bool isAdded = await _menuWrite.AddAsync(menu);
             return Ok(isAdded);
         }
@@ -94,14 +88,16 @@ namespace Demergenza.Controllers
             if (!Guid.TryParse(id, out Guid parsedId)) return BadRequest("invalid id type");
             Menu? menu = await _menuRead.GetByIdAsync(parsedId);
             if (menu is null)
-            {
                 return BadRequest("Specified category doesnt exist");
-            }
 
-            await _menuWrite.RemoveAsync(Guid.Parse(id));
+            await _menuWrite.RemoveAsync(parsedId);
             await _menuWrite.SaveAsync();
-            bool isDeleted = _imageService.DeleteImageByName(Path.GetFileName(menu.Image));
-            return Ok(isDeleted);
+            
+            if (menu.Image is not null)
+            {
+                _imageService.DeleteImageByName(Path.GetFileName(menu.Image));
+            }
+            return Ok();
         }
 
         [Authorize]
@@ -122,9 +118,10 @@ namespace Demergenza.Controllers
             {
                 string? oldImageName = Path.GetFileName(menu.Image);
                 string newImageName = _imageService.SaveImage(menuModel.MenuImage);
-                menu.Image = $"{Request.Scheme}://{Request.Host}/data-images/{newImageName}";
+                menu.Image = newImageName;
                 if (oldImageName != null) _imageService.DeleteImageByName(oldImageName);
             }
+
             await _menuWrite.UpdateAsync(menu);
 
             return Ok(menu);
